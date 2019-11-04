@@ -4,10 +4,10 @@ image_config: &image_config
   # either as project-specific environment variables
   # or as resources in your organization's org-global Context
 
-  IMAGE_NAME: boh-ruby 
+  IMAGE_NAME: bohruby 
   # name your image (no spaces please!)
 
-  IMAGE_TAG: brianoh1979/ruby 
+  IMAGE_TAG: ruby263 
   # give your image a tag (no spaces please!)
 
   # NOTE: if you're modifying this config.yml file manually
