@@ -4,10 +4,12 @@ image_config: &image_config
   # either as project-specific environment variables
   # or as resources in your organization's org-global Context
 
-  IMAGE_NAME: bohruby 
+  #IMAGE_NAME: bohruby
+  IMAGE_NAME: cci-demo-docker-primary 
   # name your image (no spaces please!)
 
-  IMAGE_TAG: ruby263 
+  #IMAGE_TAG: ruby263
+  IMAGE_TAG: 0.0.1 
   # give your image a tag (no spaces please!)
 
   # NOTE: if you're modifying this config.yml file manually
