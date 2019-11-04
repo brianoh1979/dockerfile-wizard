@@ -63,7 +63,7 @@ jobs:
 
   test_image:
     docker:
-      - image: $DOCKER_USERNAME/(name of image):(image tag)
+      - image: $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG
         environment:
           <<: *image_config
 
