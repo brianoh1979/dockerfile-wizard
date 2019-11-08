@@ -95,7 +95,7 @@ ENV BUNDLER_VERSION 1.14.3
 RUN gem install bundler --version "$BUNDLER_VERSION"
 
 #RUN apt-get install nodejs
-RUN apt-get install xvfb libgtk-3-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 --fix-missing
+#RUN apt-get install xvfb libgtk-3-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 --fix-missing
 #RUN npm install -g yarn@0.18.1
 ENV PATH "$PATH:/root/.yarn/bin/:/usr/local/bin"
 
