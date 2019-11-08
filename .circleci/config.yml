@@ -41,13 +41,16 @@ image_config: &image_config
 version: 2
 jobs:
   build:
-    machine: true
+  #  machine: true
+    docker:
+      - image: circleci/node:9.8.0-stretch-browsers 
     environment:
       <<: *image_config
 
     steps:
       - checkout
-
+      - setup_remote_docker: 
+         docker_layer_caching: true
       - run: bash scripts/generate.sh > Dockerfile
 
       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
