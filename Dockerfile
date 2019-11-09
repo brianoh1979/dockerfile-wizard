@@ -63,7 +63,7 @@ RUN set -ex \
 	&& rm -rf /var/lib/apt/lists/* \
 	\
 	&& wget -O ruby.tar.xz "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR%}/ruby-$RUBY_VERSION.tar.xz" \
-	&& echo "$RUBY_DOWNLOAD_SHA256 *ruby.tar.xz" | sha256sum -c - \
+#	&& echo "$RUBY_DOWNLOAD_SHA256 *ruby.tar.xz" | sha256sum -c - \
 	\
 	&& mkdir -p /usr/src/ruby \
 	&& tar -xJf ruby.tar.xz -C /usr/src/ruby --strip-components=1 \
