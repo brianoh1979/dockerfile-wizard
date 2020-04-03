@@ -62,14 +62,14 @@
    #   - run: bash scripts/generate.sh > Dockerfile
 
 #       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-       - run:
-           name: docker login
-           command: |
-             echo "$DOCKER_PASSWORD" | \
-               docker login --username "$DOCKER_USERNAME" --password-stdin https://index.docker.io/v1
+#       - run:
+#           name: docker login
+#           command: |
+#             echo "$DOCKER_PASSWORD" | \
+#               docker login --username "$DOCKER_USERNAME" --password-stdin https://index.docker.io/v1
 #       - run: docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .
        - docker-cache/with-save-restore-images:
-           repository: bohruby
+           repository: brianoh1979/bohruby
            images: '$IMAGE_NAME:$IMAGE_TAG'
            steps:
              - docker-cache/build:
