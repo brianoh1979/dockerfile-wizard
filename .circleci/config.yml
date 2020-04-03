@@ -4,7 +4,7 @@
 
 
 # Adding comment to push fresh commit
-image_config: &image_config
+  image_config: &image_config
 
   # make sure to set your Docker Hub username & password in CircleCI,
   # either as project-specific environment variables
