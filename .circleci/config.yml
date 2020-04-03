@@ -48,10 +48,10 @@
 #   docker-cache: cci-x/docker-registry-image-cache@0.2.0
 
 #version: 2
-jobs:
-  build:
-    docker:
-      - image: circleci/node:9.8.0-stretch-browsers 
+ jobs:
+   build:
+     docker:
+       - image: circleci/node:9.8.0-stretch-browsers 
 #    environment:
 #      <<: *image_config
 
