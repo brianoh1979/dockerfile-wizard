@@ -74,7 +74,7 @@
            path: Dockerfile
 
 workflows:
-  version: 2
+#  version: 2
   dockerfile_wizard:
     jobs:
       - build
