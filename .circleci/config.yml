@@ -38,8 +38,11 @@ image_config: &image_config
  # Dockerize options: true, false
 
  # BROWSERS: # browser tools (Xvfb, PhantomJS, Firefox, Chrome, Chromedriver): true, false
+ version: 2.1
+ orbs:
+   docker-cache: cci-x/docker-registry-image-cache@0.2.0
 
-version: 2
+#version: 2
 jobs:
   build:
     docker:
@@ -50,7 +53,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker: 
-         docker_layer_caching: true
+ #        docker_layer_caching: true
    #   - run: bash scripts/generate.sh > Dockerfile
 
       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
