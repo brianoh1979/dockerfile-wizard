@@ -1,6 +1,6 @@
  version: 2.1
  orbs:
-   docker-cache: cci-x/docker-registry-image-cache@0.2.0
+   docker-cache: cci-x/docker-registry-image-cache@0.2.10
 
 
  jobs:
@@ -14,7 +14,6 @@
        - checkout
        - setup_remote_docker 
  #        docker_layer_caching: true
-   #   - run: bash scripts/generate.sh > Dockerfile
 
 #       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
        - run:
@@ -32,7 +31,6 @@
 #      - run: docker build -t circleci/$IMAGE_NAME:$IMAGE_TAG .
        - run: docker image ls -a
        - run: docker push $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG && sleep 10
-       - run: docker image ls -a
 #      - run: docker push circleci/$IMAGE_NAME:$IMAGE_TAG && sleep 10
 
        - store_artifacts:
