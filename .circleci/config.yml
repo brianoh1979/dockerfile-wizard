@@ -5,14 +5,16 @@
 
  jobs:
    build:
-     docker:
-       - image: circleci/node:9.8.0-stretch-browsers 
+     machine:
+      image: 'ubuntu-1604:201903-01'
+#     docker:
+#       - image: circleci/node:9.8.0-stretch-browsers 
 #    environment:
 #      <<: *image_config
 
      steps:
        - checkout
-       - setup_remote_docker 
+ #      - setup_remote_docker 
  #        docker_layer_caching: true
 
 #       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
