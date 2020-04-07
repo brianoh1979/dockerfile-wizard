@@ -25,8 +25,8 @@
                docker login --username "$DOCKER_USERNAME" --password-stdin https://index.docker.io/v2
 #       - run: docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .
        - docker-cache/with-save-restore-images:
-           repository: ''
-           images: ''
+           repository: hub.docker.com/brianoh1979
+           images: '$IMAGE_NAME:$IMAGE_TAG'
            steps:
              - docker-cache/build:
                  command: 'docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .'
