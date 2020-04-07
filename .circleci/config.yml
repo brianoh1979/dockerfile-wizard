@@ -26,7 +26,7 @@
 #       - run: docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .
        - docker-cache/with-save-restore-images:
            repository: ''
-           images: '$IMAGE_NAME:$IMAGE_TAG'
+           images: ''
            steps:
              - docker-cache/build:
                  command: 'docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .'
