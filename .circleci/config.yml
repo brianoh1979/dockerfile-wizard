@@ -22,14 +22,21 @@
            name: docker login
            command: |
              echo "$DOCKER_PASSWORD" | \
-               docker login --username "$DOCKER_USERNAME" --password-stdin https://index.docker.io/v2
+               docker login --username "$DOCKER_USERNAME" --password-stdin 
 #       - run: docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .
+       - run:
+           name: "Generate cache key"
+           command: |
+             md5sum Dockerfile | awk '{print $1}' > /tmp/cache-key
+
        - docker-cache/with-save-restore-images:
            repository: brianoh1979
-           images: '$IMAGE_NAME:$IMAGE_TAG'
+           images: >-
+             bohruby:$(< /tmp/cache-key)
+             bohruby:latest
            steps:
              - docker-cache/build:
-                 command: 'docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .'
+                 command: 'docker build -t bohruby:$(< /tmp/cache-key) .'
 #      - run: docker build -t circleci/$IMAGE_NAME:$IMAGE_TAG .
        - run: docker image ls -a
        - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
