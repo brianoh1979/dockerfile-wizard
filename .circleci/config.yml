@@ -33,7 +33,7 @@
            repository: brianoh1979
            images: >-
              bohruby:$(< /tmp/cache-key)
-             bohruby:latest
+#             bohruby:latest
            steps:
              - docker-cache/build:
                  command: 'docker build -t bohruby:$(< /tmp/cache-key) .'
