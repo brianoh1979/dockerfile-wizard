@@ -39,7 +39,6 @@
      jobs:
        - with-dlc
        - no-cache: *slow-benchmark
-       - with-cache-from-gcr: *slow-benchmark
        - with-cache-from-save-load: *slow-benchmark
 
 
