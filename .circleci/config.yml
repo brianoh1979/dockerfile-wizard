@@ -25,7 +25,6 @@
            publish-sha-version: true
            requires:
              - build-and-validate
-             - test-orb-gcr
              - test-orb-hub
        - orb-tools/dev-promote-prod:
            <<: *only-master
