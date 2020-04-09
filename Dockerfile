@@ -77,6 +77,6 @@ WORKDIR /root/
 #COPY --from=0 /go/src/github.com/alexellis/href-counter/app .
 CMD ["./app"]  
 
-FROM python:3.7.2-alpine3.8
+FROM python:3.7-alpine3.7
 COPY . /app
 ENTRYPOINT [“python”, “./app/my_script.py”, “my_var”]
