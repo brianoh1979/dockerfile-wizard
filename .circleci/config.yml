@@ -1,19 +1,5 @@
  version: 2.1
 
-# anchors:
-#  slow-benchmark: &slow-benchmark
-#    filters:
-#      branches:
-#        only: [/benchmark.*/]
-
-
-  only-master: &only-master
-    filters:
-      branches:
-        only:
-          - master
-
-
  workflows:
    test-and-publish:
      jobs:
