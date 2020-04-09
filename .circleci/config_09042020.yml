@@ -1,0 +1,53 @@
+ version: 2.1
+ orbs:
+   docker-cache: cci-x/docker-registry-image-cache@0.2.11
+
+
+ jobs:
+   build:
+     machine:
+      image: 'ubuntu-1604:201903-01'
+#     docker:
+#       - image: circleci/node:9.8.0-stretch-browsers 
+#    environment:
+#      <<: *image_config
+
+     steps:
+       - checkout
+ #      - setup_remote_docker 
+ #        docker_layer_caching: true
+
+#       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+       - run:
+           name: docker login
+           command: |
+             echo "$DOCKER_PASSWORD" | \
+               docker login --username "$DOCKER_USERNAME" --password-stdin 
+#       - run: docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .
+       - run:
+           name: "Generate cache key"
+           command: |
+             md5sum Dockerfile | awk '{print $1}' > /tmp/cache-key
+
+       - docker-cache/with-save-restore-images:
+           repository: brianoh1979
+           images: >-
+             bohruby:$(< /tmp/cache-key)
+#             bohruby:latest
+           steps:
+             - docker-cache/build:
+                 command: 'docker build -t bohruby:$(< /tmp/cache-key) .'
+#      - run: docker build -t circleci/$IMAGE_NAME:$IMAGE_TAG .
+       - run: docker image ls -a
+#       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+#       - run: docker push $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG && sleep 10
+#      - run: docker push circleci/$IMAGE_NAME:$IMAGE_TAG && sleep 10
+
+       - store_artifacts:
+           path: Dockerfile
+
+#workflows:
+#  version: 2
+#  dockerfile_wizard:
+#    jobs:
+#      - build

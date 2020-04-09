@@ -1,53 +1,522 @@
  version: 2.1
- orbs:
-   docker-cache: cci-x/docker-registry-image-cache@0.2.11
+
+ anchors:
+  slow-benchmark: &slow-benchmark
+    filters:
+      branches:
+        only: [/benchmark.*/]
+
+
+  only-master: &only-master
+    filters:
+      branches:
+        only:
+          - master
+
+
+workflows:
+  test-and-publish:
+    jobs:
+#      - test-orb-gcr
+      - test-orb-hub
+#      - test-orb-hub-alpine
+      - build-and-validate
+      - orb-tools/publish-dev:
+          orb-name: cci-x/docker-registry-image-cache
+          publish-alpha-version: false
+          publish-sha-version: true
+          requires:
+            - build-and-validate
+#            - test-orb-gcr
+            - test-orb-hub
+#            - test-orb-hub-alpine
+      - orb-tools/dev-promote-prod:
+          <<: *only-master
+          orb-name: cci-x/docker-registry-image-cache
+          publish-version-tag: false
+          requires:
+            - orb-tools/publish-dev
+
+
+  benchmark:
+    jobs:
+      - with-dlc
+      - no-cache: *slow-benchmark
+      - with-cache-from-gcr: *slow-benchmark
+      - with-cache-from-save-load: *slow-benchmark
 
 
  jobs:
-   build:
-     machine:
-      image: 'ubuntu-1604:201903-01'
-#     docker:
-#       - image: circleci/node:9.8.0-stretch-browsers 
+  build-and-validate:
+    docker:
+      - image: circleci/ruby:2.4
+    steps:
+      - checkout
+      - orb-tools/extract-inline-orb:
+          file: orb.yml
+          orb: docker-cache
+          source: .circleci/config.yml
+      - cli/install
+      - orb-tools/validate
+
+
+  no-cache:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - checkout
+      - run: |
+          docker build .
+
+
+  with-dlc:
+    machine:
+      image: ubuntu-1604:201903-01
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: docker image ls -a
+      - run: |
+          docker build .
+
+
+#  with-cache-from-gcr:
+#    machine: {image: 'ubuntu-1604:201903-01'}
+#    steps:
+#      - checkout
+#      - restore_cache:
+#          keys: ['v1-image-tags-']
+#      - run:
+#          name: docker login
+#          command: |
+#            echo "$GCR_KEY_FILE" | docker login --username _json_key --password-stdin https://us.gcr.io
+
+#      - run: |
+#          if [[ -f /tmp/docker-tag ]]; then
+#            docker pull "$(< /tmp/docker-tag)" || true
+#          fi
+
+#      - run: |
+#          tag="us.gcr.io/dnephin-demo-project/cache:$CIRCLE_BUILD_NUM"
+#          time docker build -t "$tag" --cache-from "$(< /tmp/docker-tag)" .
+#          time docker push "$tag"
+#          echo "$tag" > /tmp/docker-tag
+
+
+#      - save_cache:
+#          key: 'v1-image-tags-{{ .BuildNum }}'
+#          paths: [/tmp/docker-tag]
+
+
+#  test-orb-gcr:
+#    machine: {image: 'ubuntu-1604:201903-01'}
 #    environment:
-#      <<: *image_config
+#      CCI_DRIC_USERNAME: _json_key
+#      CCI_DRIC_REGISTRY: https://us.gcr.io
+#    steps:
+#      - checkout
+#      - run: echo "export CCI_DRIC_PASSWORD='$GCR_KEY_FILE'" >> $BASH_ENV
+#      - docker-cache/with-save-restore-images:
+#          repository: us.gcr.io/dnephin-demo-project
+#          images: >-
+#            cache-orb:master
+#            cache-orb:${CIRCLE_BRANCH/\//-}
+#          steps:
+#            - docker-cache/build:
+#               command: docker build -t cache-orb:${CIRCLE_BRANCH/\//-} .
+#            - docker-cache/tag:
+#                tags: |-
+#                  cache-orb:${CIRCLE_BRANCH/\//-} cache-orb:retagged-a
+#                  cache-orb:${CIRCLE_BRANCH/\//-} cache-orb:retagged-b
+#            - run:
+#                name: 'Check images were tagged'
+#                command: |
+#                  docker image inspect cache-orb:retagged-a > /dev/null
+#                  docker image inspect cache-orb:retagged-b > /dev/null
 
-     steps:
-       - checkout
- #      - setup_remote_docker 
- #        docker_layer_caching: true
 
-#       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-       - run:
-           name: docker login
-           command: |
-             echo "$DOCKER_PASSWORD" | \
-               docker login --username "$DOCKER_USERNAME" --password-stdin 
-#       - run: docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .
-       - run:
-           name: "Generate cache key"
-           command: |
-             md5sum Dockerfile | awk '{print $1}' > /tmp/cache-key
+  test-orb-hub:
+    machine: {image: 'ubuntu-1604:201903-01'}
+    steps:
+      - checkout
+      - run:
+          name: docker login
+          command: |
+            echo "$DOCKER_HUB_ACCESS_TOKEN" | docker login --username circlecidlcalts --password-stdin
+      - docker-cache/with-save-restore-images:
+          repository: circlecidlcalts
+          images: >-
+            cache-orb:master
+            cache-orb:${CIRCLE_BRANCH/\//-}
+          steps:
+            - docker-cache/build:
+                command: docker build -t cache-orb:${CIRCLE_BRANCH/\//-} .
+            - docker-cache/tag:
+                tags: |-
+                  cache-orb:${CIRCLE_BRANCH/\//-} cache-orb:retagged-a
+                  cache-orb:${CIRCLE_BRANCH/\//-} cache-orb:retagged-b
+            - run:
+                name: 'Check images were tagged'
+                command: |
+                  docker image inspect cache-orb:retagged-a > /dev/null
+                  docker image inspect cache-orb:retagged-b > /dev/null
 
-       - docker-cache/with-save-restore-images:
-           repository: brianoh1979
-           images: >-
-             bohruby:$(< /tmp/cache-key)
-#             bohruby:latest
-           steps:
-             - docker-cache/build:
-                 command: 'docker build -t bohruby:$(< /tmp/cache-key) .'
-#      - run: docker build -t circleci/$IMAGE_NAME:$IMAGE_TAG .
-       - run: docker image ls -a
-#       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-#       - run: docker push $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG && sleep 10
-#      - run: docker push circleci/$IMAGE_NAME:$IMAGE_TAG && sleep 10
 
-       - store_artifacts:
-           path: Dockerfile
+#  test-orb-hub-alpine:
+#    docker:
+#      - image: docker
+#    steps:
+#      - checkout
+#      - setup_remote_docker
+#      - run:
+#          name: docker login
+#          command: |
+#            echo "$DOCKER_HUB_ACCESS_TOKEN" | docker login --username circlecidlcalts --password-stdin
+#      - docker-cache/with-save-restore-images:
+#          repository: circlecidlcalts
+#          images: >-
+#            cache-orb:master
+#            cache-orb:${CIRCLE_BRANCH/\//-}
+#          steps:
+#            - docker-cache/build:
+#               command: docker build -t cache-orb:${CIRCLE_BRANCH/\//-} .
+#            - docker-cache/tag:
+#                tags: |-
+#                  cache-orb:${CIRCLE_BRANCH/\//-} cache-orb:retagged-a
+#                  cache-orb:${CIRCLE_BRANCH/\//-} cache-orb:retagged-b
+#            - run:
+#                name: 'Check images were tagged'
+#                command: |
+#                  docker image inspect cache-orb:retagged-a > /dev/null
+#                  docker image inspect cache-orb:retagged-b > /dev/null
 
-#workflows:
-#  version: 2
-#  dockerfile_wizard:
-#    jobs:
-#      - build
+
+  with-cache-from-save-load:
+    machine: {image: 'ubuntu-1604:201903-01'}
+    steps:
+      - checkout
+      - restore_cache:
+          keys: ['v1-image-cache-']
+
+      - run: |
+          if [[ -d /tmp/img-cache ]]; then
+              echo "Loading $(< /tmp/img-cache/tag)"
+              docker load --input "/tmp/img-cache/image.tar"
+          fi
+
+      - run: |
+          set -x
+          tag="dnephin/cache:$CIRCLE_BUILD_NUM"
+          time docker build -t "$tag" --cache-from "$(< /tmp/img-cache/tag)" .
+          mkdir -p /tmp/img-cache
+          echo "$tag" > /tmp/img-cache/tag
+          time docker save -o /tmp/img-cache/image.tar "$tag"
+
+      - save_cache:
+          key: 'v1-image-cache-{{ .BuildNum }}'
+          paths: [/tmp/img-cache]
+
+
+orbs:
+  orb-tools: circleci/orb-tools@8.27.4
+  cli: circleci/circleci-cli@0.1.5
+
+  docker-cache:
+    description: |
+      Save and restore a docker image cache using a registry.
+
+      This orb provides commands which may be used as an alternative to the CircleCI 'docker_layer_caching' feature. It is intended to be used with 'machine' executors or jobs which use 'setup_remote_docker'.
+
+      Using this orb
+
+      This orb requires a docker registry which will be used to push and pull images. Popular docker registries include Docker Hub, Google Container Registry, AWS Elastic Container Registry, and Quay.io. If you already use one of these registries in your job you are all set. The registry you choose for the cache may be different from the registry you use to publish images.
+
+      Using pulled images as a cache for docker build
+
+      To use images pulled from a docker registry as a cache for image building you must use `--cache-from` with a list of docker images. This orb provides a `build` command to automatically add the images listed in the 'images' field to 'docker build'. If you use a script or a tool like docker-compose to build images you will need to pass the list of images yourself. With docker-compose make sure to set `build.cache_from` in your docker-compose.yml.
+
+      Image tags
+
+      The images listed in 'with-save-restore-images.images' are effectively the keys used for the cache. For best results you may want to use two tags, one which is gauranteed to exist (for example a tag that is pushed when CI runs on the 'master' branch) and one which is more likely to match the current Dockerfile (for example a tag which includes the current branch name or a hash of the Dockerfile).
+
+      If you are building multiple docker images, you can include one or more tags for each image.
+
+    commands:
+      with-save-restore-images:
+        description: |
+          Restore a cache, run steps, then save a cache of the new image.
+
+          The docker pull and docker push are optional, any failures will be ignored so that missing images do not cause the job to fail.
+
+        parameters:
+          images:
+            description: |
+              A list of docker image names, separated by spaces, to pull from a registry
+              and push to the registry when the nested steps finish. If repository is set the
+              images will be prefixed with the value of that field before pulling and pushing.
+            default: ""
+            type: string
+
+          repository:
+            description: |
+              A prefix added to each image name before pulling and pushing from the registry.
+              A repository may be just the hostname of the registry, or it may include the organization
+              prefix as well.
+            type: string
+            default: ""
+
+          steps:
+            description: |
+              Steps to run after the cache has been pulled from a registry, and before pushing the
+              new images to the registry.
+              Any steps which build docker images must be included in this list.
+            type: steps
+
+          save-when:
+            description: |
+              Condition used as the when attribute of the save cache operation.
+              See https://circleci.com/docs/2.0/configuration-reference/#the-when-attribute
+              for supported values.
+            type: string
+            default: on_success
+
+          image-filename:
+            description: |
+              Path to a file used to store the list of images.
+              You most likely don't need to change this.
+            type: string
+            default: "/tmp/docker-cache/images"
+
+          parallelism:
+            description: |
+              Maximum number of processess to use when pushing and pulling images.
+            type: integer
+            default: 1
+
+        steps:
+          - run:
+              name: "DRIC: Setup cache"
+              command: |
+                if [[ -n "$CCI_DRIC_USERNAME" ]]; then
+                  echo "$CCI_DRIC_PASSWORD" | \
+                    docker login --username "$CCI_DRIC_USERNAME" --password-stdin "$CCI_DRIC_REGISTRY"
+                fi
+
+                filename="<<parameters.image-filename>>"
+                filename_with_repo="${filename}-with-repo"
+
+                # clear any previous runs
+                rm -f "${filename}" "${filename_with_repo}"
+
+                # save images list to a file
+                images="<<parameters.images>>"
+                mkdir -p "$(dirname $filename)"
+                echo $images | \
+                  xargs -n 1 | \
+                  uniq | \
+                  xargs -n 1 echo >> "$filename"
+
+                filename_with_repo="${filename}-with-repo"
+                cp "$filename" "$filename_with_repo"
+                repo="<<parameters.repository>>"
+                if [[ -n "$repo" ]]; then
+                  sed -i -e "s|^|${repo%/}/|" "$filename_with_repo"
+                fi
+
+          - run:
+              name: "DRIC: Restore cache from registry <<parameters.repository>>"
+              command: |
+                filename="<<parameters.image-filename>>"
+                filename_with_repo="${filename}-with-repo"
+                cat "$filename_with_repo" | xargs -r -P <<parameters.parallelism>> -n 1 docker pull || true
+
+                docker image ls -a
+
+          - steps: << parameters.steps >>
+
+          - run:
+              name: "DRIC: Retag images"
+              command: |
+                repo="<<parameters.repository>>"
+                if [[ -z "$repo" ]]; then
+                  exit 0
+                fi
+
+                filename="<<parameters.image-filename>>"
+                filename_with_repo="${filename}-with-repo"
+                paste "$filename" "$filename_with_repo" | xargs -n 2 docker tag || true
+
+                docker image ls -a
+
+          - run:
+              name: "DRIC: Save cache to registry <<parameters.repository>>"
+              when: <<parameters.save-when>>
+              command: |
+                filename="<<parameters.image-filename>>"
+                filename_with_repo="${filename}-with-repo"
+                cat "${filename_with_repo}" | xargs -r -P <<parameters.parallelism>> -n 1 docker push || true
+                rm "${filename}" "${filename_with_repo}"
+
+      build:
+        description: |
+          Build a cache image adding a --cache-from parameter for every image in the list
+          provided to with-save-restore-images.
+
+        parameters:
+          command:
+            description: |
+              A `docker build` command to run. Should include a `--tag` parameter for
+              the image.
+            type: string
+
+          step-name:
+            description: |
+              Name for the step.
+            type: string
+            default: "docker build"
+
+          image-filename:
+            description: |
+              Path to a file used to store the list of images. Must match the path provided to
+              'with-save-restore-images'.
+              You most likely don't need to change this.
+            type: string
+            default: "/tmp/docker-cache/images"
+
+        steps:
+          - run:
+              name: <<parameters.step-name>>
+              command: |
+                set -x
+                docker() {
+                  cache_from=$(sed -e 's|^|--cache-from=|' "<<parameters.image-filename>>-with-repo" | xargs)
+                  case "$1" in
+                    build) shift 1; command docker build $cache_from "$@";;
+                    *)     command docker "$@";;
+                  esac
+                }
+                <<parameters.command>>
+
+
+      tag:
+        description: |
+          Tag a group of Docker images. To make the cache work when you are not using the orb's `build` command,
+          your build must produce Docker images with the tags listed in the `images` parameter. If you do not wish
+          to change your existing tagging, or you are using docker-compose or scripts where the image tags
+          cannot easily be controlled, then this command will help.
+
+        parameters:
+          tags:
+            description: |
+              A list of image tag pairs, separated by spaces, which will be passed to docker tag.
+              The first item in the pair is the source tag, and the second the destination.
+            type: string
+
+          step-name:
+            description: |
+              Name for the step.
+            type: string
+            default: "Tag docker images"
+
+        steps:
+          - run:
+              name: <<parameters.step-name>>
+              command: |
+                set -x
+                cat \<<EOF | xargs -n 2 docker tag
+                <<parameters.tags>>
+                EOF
+
+
+    examples:
+
+      cache_using_branch_name_key:
+        description: |
+          This example demonstrates how to use this orb to speed up a 'docker build'. It uses the git branch name as a cache key, and the master branch as a fallback when the branch is new.
+
+          The first step is to log into a GCR registry. The values for these REGISTRY_ variables may be set by project environment variables or from a CircleCI Context.
+
+          Once login is complete the 'with-save-restore-images' command pulls images from a registry. This example uses two images. An image tagged with 'master' which acts as a base for new branches, and an image tagged with the name of the git branch. This example removes any slashes from the git branch name using bash string substitution ('${var/\//-}'). The images are listed using the YAML '>-' symbol, which replaces newlines with spaces and removes trailing newlines. This allows you to list images one per line.
+
+          The nested step uses the 'build' command to build a new docker image. The orb command takes care of adding the '--cache-from' arguments to 'docker build' so that the images that were pulled are used as a cache. You may use as many nested steps as necessary. Only steps which build docker images need to be nested under 'with-save-restore-images'.
+
+          Once all the nested steps have completed the 'with-save-restore-images' command pushes all the 'images' to the same registry where it pulled from originally.
+
+          Finally, the rest of the job will continue and may use any of the images pulled or built in previous steps. In this example tests are run using a `test-all` script.
+
+        usage:
+
+          version: 2.1
+
+          orbs:
+            docker-cache: cci-x/docker-registry-image-cache@0.2.0
+
+          workflows:
+            ci:
+              jobs:
+                - build-docker-image
+
+          jobs:
+            build-docker-image:
+              machine: {image: 'ubuntu-1604:201903-01'}
+              steps:
+                - run:
+                    name: docker login
+                    command: |
+                      echo "$REGISTRY_PASSWORD" | \
+                        docker login --username "$REGISTRY_USERNAME" --password-stdin https://us.gcr.io
+
+                - docker-cache/with-save-restore-images:
+                    repository: us.gcr.io/myrepo
+                    images: >-
+                      myapp:${CIRCLE_BRANCH/\//-}
+                      myapp:master
+                    steps:
+                      - docker-cache/build:
+                          command: docker build -t myapp:${CIRCLE_BRANCH/\//-} .
+                - run:
+                    name: Test
+                    command: ./test-all
+
+      cache_using_hash_of_dockerfile_key:
+        description: |
+          This example demonstrates how to use this orb to speed up a 'docker build'. It uses the md5sum of the Dockerfile as a cache key. It follows all the same steps as the example above, except that it uses a different key for the cache. It assumes that an image with a 'latest' tag is pushed from the master CI job and can be used as a fallback when the Dockerfile changes.
+
+        usage:
+
+          version: 2.1
+
+          orbs:
+            docker-cache: cci-x/docker-registry-image-cache@0.2.0
+
+          workflows:
+            ci:
+              jobs:
+                - build-docker-image
+
+          jobs:
+            build-docker-image:
+              machine: {image: 'ubuntu-1604:201903-01'}
+              steps:
+                - run:
+                    name: docker login
+                    command: |
+                      echo "$REGISTRY_PASSWORD" | \
+                        docker login --username "$REGISTRY_USERNAME" --password-stdin
+
+                - run:
+                    name: "Generate cache key"
+                    command: |
+                      md5sum Dockerfile | awk '{print $1}' > /tmp/cache-key
+
+                - docker-cache/with-save-restore-images:
+                    repository: myhubrepo
+                    images: >-
+                      myapp:$(< /tmp/cache-key)
+                      myapp:latest
+                    steps:
+                      - docker-cache/build:
+                          command: docker build -t myapp:$(< /tmp/cache-key) .
+                - run:
+                    name: Test
+                    command: ./test-all
