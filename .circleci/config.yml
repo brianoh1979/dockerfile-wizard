@@ -7,28 +7,6 @@
        - with-dlc
 
  jobs:
-#   build-and-validate:
-#     docker:
-#       - image: circleci/ruby:2.4
-#     steps:
-#       - checkout
-#       - orb-tools/extract-inline-orb:
-#           file: orb.yml
-#           orb: docker-cache
-#           source: .circleci/config.yml
-#       - cli/install
-#       - orb-tools/validate
-
-
-#   no-cache:
-#     machine:
-#       image: ubuntu-1604:201903-01
-#     steps:
-#       - checkout
-#       - run: |
-#           docker build .
-
-
    with-dlc:
      machine:
        image: ubuntu-1604:201903-01
@@ -64,32 +42,6 @@
                  command: |
                    docker image inspect cache-orb:retagged-a > /dev/null
                    docker image inspect cache-orb:retagged-b > /dev/null
-
-#   with-cache-from-save-load:
-#     machine: {image: 'ubuntu-1604:201903-01'}
-#     steps:
-#       - checkout
-#       - restore_cache:
-#           keys: ['v1-image-cache-']
-
-#       - run: |
-#           if [[ -d /tmp/img-cache ]]; then
-#               echo "Loading $(< /tmp/img-cache/tag)"
-#               docker load --input "/tmp/img-cache/image.tar"
-#           fi
-
-#       - run: |
-#           set -x
-#           tag="dnephin/cache:$CIRCLE_BUILD_NUM"
-#           time docker build -t "$tag" --cache-from "$(< /tmp/img-cache/tag)" .
-#           mkdir -p /tmp/img-cache
-#           echo "$tag" > /tmp/img-cache/tag
-#           time docker save -o /tmp/img-cache/image.tar "$tag"
-
-#       - save_cache:
-#           key: 'v1-image-cache-{{ .BuildNum }}'
-#           paths: [/tmp/img-cache]
-
 
  orbs:
    orb-tools: circleci/orb-tools@8.27.4
