@@ -1,10 +1,10 @@
  version: 2.1
 
- anchors:
-  slow-benchmark: &slow-benchmark
-    filters:
-      branches:
-        only: [/benchmark.*/]
+# anchors:
+#  slow-benchmark: &slow-benchmark
+#    filters:
+#      branches:
+#        only: [/benchmark.*/]
 
 
   only-master: &only-master
@@ -18,6 +18,7 @@
    test-and-publish:
      jobs:
        - test-orb-hub
+       - with-dlc
 
  jobs:
 #   build-and-validate:
