@@ -18,7 +18,7 @@
    test-and-publish:
      jobs:
        - test-orb-hub
-       - build-and-validate
+#       - build-and-validate
        - orb-tools/publish-dev:
            orb-name: cci-x/docker-registry-image-cache
            publish-alpha-version: false
@@ -81,9 +81,9 @@
        - run:
            name: docker login
            command: |
-             echo "$DOCKER_HUB_ACCESS_TOKEN" | docker login --username circlecidlcalts --password-stdin
+             echo "$DOCKER_PASSWORD" | docker login --username brianoh1979 --password-stdin
        - docker-cache/with-save-restore-images:
-           repository: circlecidlcalts
+           repository: brianoh1979
            images: >-
              cache-orb:master
              cache-orb:${CIRCLE_BRANCH/\//-}
