@@ -216,10 +216,8 @@
                  filename="<<parameters.image-filename>>"
                  filename_with_repo="${filename}-with-repo"
 
-                # clear any previous runs
                  rm -f "${filename}" "${filename_with_repo}"
 
-                # save images list to a file
                  images="<<parameters.images>>"
                  mkdir -p "$(dirname $filename)"
                  echo $images | \
