@@ -9,7 +9,7 @@
  jobs:
    with-dlc:
      machine:
-       image: ubuntu-1604:201903-01
+       image: circleci/classic:201708-01
        docker_layer_caching: true
      steps:
        - checkout
