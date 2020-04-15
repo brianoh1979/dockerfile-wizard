@@ -11,7 +11,7 @@
  #    machine:
  #      image: circleci/classic:201708-01
       docker:
-        - image: circleci/node:9.8.0-stretch-browsers     
+        - image: circleci/node:stretch     
  #      docker_layer_caching: true
       steps:
         - checkout
@@ -23,7 +23,7 @@
 
    test-orb-hub:
       docker:
-        - image: circleci/node:9.8.0-stretch-browsers
+        - image: circleci/node:stretch
  #    machine:
  #      image: circleci/classic:201708-01
       steps:
