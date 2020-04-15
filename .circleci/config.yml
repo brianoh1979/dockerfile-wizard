@@ -9,19 +9,19 @@
  jobs:
    with-dlc:
      machine:
-      image: circleci/classic:201708-01
+       image: circleci/classic:201708-01
        docker_layer_caching: true
-      steps:
-        - checkout
+     steps:
+       - checkout
  #       - setup_remote_docker:
  #           docker_layer_caching: true
-        - run: docker image ls -a
-        - run: |
-            docker build .
+       - run: docker image ls -a
+       - run: |
+           docker build .
 
    test-orb-hub:
      machine:
-      image: circleci/classic:201708-01
+       image: circleci/classic:201708-01
      steps:
        - checkout
  #       - setup_remote_docker:
