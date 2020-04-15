@@ -27,7 +27,8 @@
  #       - setup_remote_docker:
  #           docker_layer_caching: true
        - run: sudo apt-get purge -y docker-engine docker docker.io docker-ce
-       - run: sudo apt-get autoremove -y --purge docker-engine docker docker.io docker-ce 
+ #      - run: sudo apt-get autoremove -y --purge docker-engine docker docker.io docker-ce
+       - run: sudo apt-get remove docker docker-engine docker.io containerd runc 
        - run: sudo apt-get update
        - run: sudo apt-get install \
                 apt-transport-https \
