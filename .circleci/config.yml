@@ -18,7 +18,8 @@
            docker build .
 
    test-orb-hub:
-     machine: {image: 'ubuntu-1604:201903-01'}
+     machine:
+       image: circleci/classic:201708-01
      steps:
        - checkout
        - run: docker --version
