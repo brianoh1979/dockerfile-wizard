@@ -44,7 +44,7 @@
        - run: apt-cache search docker-ce
        - run: sudo apt update
        - run: apt-cache madison docker-ce
-       - run: sudo apt-get install docker-ce=<5:19.03.8~3-0~ubuntu-xenial> docker-ce-cli=<5:19.03.8~3-0~ubuntu-xenial> containerd.io
+       - run: sudo apt-get install docker-ce=5:19.03.8~3-0~ubuntu-xenial docker-ce-cli=5:19.03.8~3-0~ubuntu-xenial containerd.io
        - run: sudo docker run hello-world
        - run: docker --version
        - run:
