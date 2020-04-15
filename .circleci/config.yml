@@ -43,6 +43,7 @@
        - run: sudo apt update
        - run: apt-cache search docker-ce
        - run: sudo apt update
+       - run: apt-cache madison docker-ce
        - run: sudo apt install docker-ce
        - run: docker --version
        - run:
