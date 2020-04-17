@@ -12,7 +12,7 @@ RUN \
   apt-get install sbt && \
   sbt sbtVersion
 
-FROM php:7.0-apache  
+FROM php:7.2-apache  
 COPY . /var/www/php  
 
 FROM launcher.gcr.io/google/ubuntu16_04
