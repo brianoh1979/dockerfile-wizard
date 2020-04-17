@@ -1,5 +1,5 @@
  version: 2.1
-
+ 
  orbs:
    docker-cache: cci-x/docker-registry-image-cache@0.2.11
 
@@ -11,51 +11,43 @@
 
  jobs:
    with-dlc:
-     machine: 
-       image: ubuntu-1604:201903-01
-       docker_layer_caching: true
-     steps:
-       - checkout
-       - run: docker image ls -a
-       - run: |
-           docker build .
+      docker:
+        - image: circleci/node:stretch     
+      steps:
+        - checkout
+        - setup_remote_docker:
+            docker_layer_caching: true
+        - run: docker image ls -a
+        - run: |
+            docker build .
 
    test-orb-hub:
-     machine: 
-       image: ubuntu-1604:201903-01
-     steps:
-       - checkout
- #      - run: sudo apt-get purge -y docker-engine docker docker.io docker-ce
- #      - run: sudo apt-get update
- #      - run: sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
- #      - run: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
- #      - run: sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
- #      - run: sudo apt update
- #      - run: apt-cache search docker-ce
- #      - run: sudo apt update
- #      - run: apt-cache madison docker-ce
- #      - run: sudo apt-get install docker-ce=5:19.03.8~3-0~ubuntu-xenial docker-ce-cli=5:19.03.8~3-0~ubuntu-xenial containerd.io
- #      - run: sudo docker run hello-world
-       - run: docker --version
-       - run:
-           name: docker login
-           command: |
-             echo "$DOCKER_PASSWORD" | docker login --username brianoh1979 --password-stdin 
-       - docker-cache/with-save-restore-images:
-           repository: brianoh1979
-           images: >-
-             cache-orb:master
-             cache-orb:${CIRCLE_BRANCH/\//-}
-           steps:
-             - docker-cache/build:
-                 command: docker build -t cache-orb:${CIRCLE_BRANCH/\//-} .
- #            - docker-cache/tag:
- #                tags: |-
- #                  cache-orb:${CIRCLE_BRANCH/\//-} cache-orb:retagged-a
- #                  cache-orb:${CIRCLE_BRANCH/\//-} cache-orb:retagged-b
- #            - run:
- #                name: 'Check images were tagged'
- #                command: |
- #                  docker image inspect cache-orb:retagged-a > /dev/null
- #                  docker image inspect cache-orb:retagged-b > /dev/null
+      docker:
+        - image: circleci/node:stretch
+      steps:
+        - checkout
+        - setup_remote_docker:
+            docker_layer_caching: true
+        - run: docker --version
+        - run:
+            name: docker login
+            command: |
+              echo "$DOCKER_PASSWORD" | docker login --username brianoh1979 --password-stdin 
+        - docker-cache/with-save-restore-images:
+            repository: brianoh1979
+            images: >-
+              cache-orb:master
+              cache-orb:${CIRCLE_BRANCH/\//-}
+            steps:
+              - docker-cache/build:
+                  command: docker build -t cache-orb:${CIRCLE_BRANCH/\//-} .
+ #             - docker-cache/tag:
+ #                 tags: |-
+ #                   cache-orb:${CIRCLE_BRANCH/\//-} cache-orb:retagged-a
+ #                   cache-orb:${CIRCLE_BRANCH/\//-} cache-orb:retagged-b
+ #             - run:
+ #                 name: 'Check images were tagged'
+ #                 command: |
+ #                   docker image inspect cache-orb:retagged-a > /dev/null
+ #                   docker image inspect cache-orb:retagged-b > /dev/null
 
