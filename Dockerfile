@@ -13,7 +13,9 @@ RUN \
   sbt sbtVersion
 
 FROM php:7.2-apache  
-COPY . /var/www/php  
+COPY img /var/www/php
+COPY Makefile /var/www/php
+COPY scripts /var/www/php  
 
 FROM launcher.gcr.io/google/ubuntu16_04
 
