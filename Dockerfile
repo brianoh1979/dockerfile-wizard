@@ -12,12 +12,6 @@ RUN \
   apt-get install sbt && \
   sbt sbtVersion
 
-FROM alpine:latest  
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
-COPY --from=base1 * .
-CMD ["./app"] 
-
 FROM php:7.2-apache  
 COPY img /var/www/php
 COPY Makefile /var/www/php
