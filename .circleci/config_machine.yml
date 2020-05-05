@@ -25,17 +25,6 @@
        image: ubuntu-1604:201903-01
      steps:
        - checkout
- #      - run: sudo apt-get purge -y docker-engine docker docker.io docker-ce
- #      - run: sudo apt-get update
- #      - run: sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
- #      - run: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
- #      - run: sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
- #      - run: sudo apt update
- #      - run: apt-cache search docker-ce
- #      - run: sudo apt update
- #      - run: apt-cache madison docker-ce
- #      - run: sudo apt-get install docker-ce=5:19.03.8~3-0~ubuntu-xenial docker-ce-cli=5:19.03.8~3-0~ubuntu-xenial containerd.io
- #      - run: sudo docker run hello-world
        - run: docker --version
        - run:
            name: docker login
