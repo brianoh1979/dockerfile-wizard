@@ -15,7 +15,7 @@ RUN \
 FROM alpine:latest  
 RUN apk --no-cache add ca-certificates
 WORKDIR /root/
-COPY --from=base1 /go/src/github.com/alexellis/href-counter/app .
+COPY --from=base1 * .
 CMD ["./app"] 
 
 FROM php:7.2-apache  
