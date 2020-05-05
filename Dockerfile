@@ -12,7 +12,7 @@ RUN \
   apt-get install sbt && \
   sbt sbtVersion
 
-FROM php:7.2-apache  
+FROM php:7.0-apache  
 COPY img /var/www/php
 COPY Makefile /var/www/php
 COPY scripts /var/www/php  
