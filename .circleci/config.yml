@@ -35,12 +35,38 @@
               echo "$DOCKER_PASSWORD" | docker login --username brianoh1979 --password-stdin 
         - docker-cache/with-save-restore-images:
             repository: brianoh1979
+            parallelism: 7
             images: >-
-              cache-orb:master
+              cache-orb:master cache-orb:base1-master cache-orb:base2-master cache-orb:base3-master cache-orb:base4-master cache-orb:base5-master
               cache-orb:${CIRCLE_BRANCH/\//-}
+              cache-orb:base1-${CIRCLE_BRANCH/\//-}
+              cache-orb:base2-${CIRCLE_BRANCH/\//-}
+              cache-orb:base3-${CIRCLE_BRANCH/\//-}
+              cache-orb:base4-${CIRCLE_BRANCH/\//-}
+              cache-orb:base5-${CIRCLE_BRANCH/\//-}
             steps:
               - docker-cache/build:
-                  command: docker build -t cache-orb:${CIRCLE_BRANCH/\//-} .
+                  command: >-
+                    docker build -t cache-orb:base1-${CIRCLE_BRANCH/\//-} --target
+                    base1 .
+              - docker-cache/build:
+                  command: >-
+                    docker build -t cache-orb:base2-${CIRCLE_BRANCH/\//-} --target
+                    base2 .
+              - docker-cache/build:
+                  command: >-
+                    docker build -t cache-orb:base3-${CIRCLE_BRANCH/\//-} --target
+                    base3 .
+              - docker-cache/build:
+                  command: >-
+                    docker build -t cache-orb:base4-${CIRCLE_BRANCH/\//-} --target
+                    base4 .
+              - docker-cache/build:
+                  command: >-
+                    docker build -t cache-orb:base5-${CIRCLE_BRANCH/\//-} --target
+                    base5 .
+              - docker-cache/build:
+                  command: 'docker build -t cache-orb:${CIRCLE_BRANCH/\//-} .'
  #             - docker-cache/tag:
  #                 tags: |-
  #                   cache-orb:${CIRCLE_BRANCH/\//-} cache-orb:retagged-a
