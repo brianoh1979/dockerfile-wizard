@@ -1,0 +1,59 @@
+ version: 2.1
+ 
+ orbs:
+   docker-cache: cci-x/docker-registry-image-cache@0.2.12
+
+ workflows:
+   test-and-publish:
+     jobs:
+       - test-orb-hub
+       - with-dlc
+
+ jobs:
+   with-dlc:
+      docker:
+        - image: circleci/node:stretch     
+      steps:
+        - checkout
+        - setup_remote_docker:
+            docker_layer_caching: true
+        - run: docker image ls -a
+        - run: |
+            docker build .
+
+   test-orb-hub:
+      docker:
+        - image: circleci/node:stretch
+      steps:
+        - checkout
+        - setup_remote_docker:
+            docker_layer_caching: true
+        - run: docker --version
+        - run:
+            name: docker login
+            command: |
+              echo "$DOCKER_PASSWORD" | docker login --username brianoh1979 --password-stdin 
+        - docker-cache/with-save-restore-images:
+            repository: brianoh1979
+            parallelism: 3
+            images: >-
+              cache-orb:master cache-orb:base1-master 
+              cache-orb:${CIRCLE_BRANCH/\//-}
+              cache-orb:base1-${CIRCLE_BRANCH/\//-}
+            steps:
+              - docker-cache/build:
+                  command: >-
+                    docker build -t cache-orb:base1-${CIRCLE_BRANCH/\//-} --target
+                    base1 .
+              - docker-cache/build:
+                  command: 'docker build -t cache-orb:${CIRCLE_BRANCH/\//-} .'
+ #             - docker-cache/tag:
+ #                 tags: |-
+ #                   cache-orb:${CIRCLE_BRANCH/\//-} cache-orb:retagged-a
+ #                   cache-orb:${CIRCLE_BRANCH/\//-} cache-orb:retagged-b
+ #             - run:
+ #                 name: 'Check images were tagged'
+ #                 command: |
+ #                   docker image inspect cache-orb:retagged-a > /dev/null
+ #                   docker image inspect cache-orb:retagged-b > /dev/null
+
