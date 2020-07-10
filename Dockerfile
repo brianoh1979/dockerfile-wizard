@@ -13,7 +13,6 @@ RUN echo \"http://dl-2.alpinelinux.org/alpine/edge/community\" >> /etc/apk/repos
 RUN echo \"http://dl-2.alpinelinux.org/alpine/edge/testing\" >> /etc/apk/repositories
 RUN apk add --update git python build-base curl bash && echo \"Fixing PhantomJS\" 
 RUN yarn install --frozen-lockfile --mutex file:/tmp/.yarn-mutex
-#COPY . .
 RUN if [ -z \"employee\" ]; then exit 1; fi;
 RUN if [ -z \"production\" ]; then exit 1; fi;
 #RUN ./build-separated-app.sh 
