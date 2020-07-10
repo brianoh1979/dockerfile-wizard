@@ -19,23 +19,23 @@ FROM nginx:1.16-alpine
 
 FROM node:12.4-alpine
 RUN if [ -z "employee" ]; then exit 1; fi;
-RUN apk add --update --no-cache tzdata && apk del tzdata"
-RUN apk add --update --no-cache   bash   build-base   curl   git   python"
+RUN apk add --update --no-cache tzdata && apk del tzdata
+RUN apk add --update --no-cache bash build-base curl git python
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --mutex file:/tmp/.yarn-mutex"
+RUN yarn install --frozen-lockfile --mutex file:/tmp/.yarn-mutex
 RUN npm set progress=false
 RUN echo \"http://dl-2.alpinelinux.org/alpine/edge/main\" > /etc/apk/repositories"
 RUN echo \"http://dl-2.alpinelinux.org/alpine/edge/community\" >> /etc/apk/repositories"
 RUN echo \"http://dl-2.alpinelinux.org/alpine/edge/testing\" >> /etc/apk/repositories"
 #COPY stack-fix.c /lib/
-RUN set -ex     && gcc  -shared -fPIC /lib/stack-fix.c -o /lib/stack-fix.so
+#RUN set -ex     && gcc  -shared -fPIC /lib/stack-fix.c -o /lib/stack-fix.so
 RUN apk add rsync
-RUN apk add --update git python build-base curl bash &&   echo \"Fixing PhantomJS\" &&     curl -Ls \"https://github.com/dustinblackman/phantomized/releases/download/2.1.1/dockerized-phantomjs.tar.gz\" | tar xz -C /"
-RUN yarn install --frozen-lockfile --mutex file:/tmp/.yarn-mutex"
+RUN apk add --update git python build-base curl bash && echo \"Fixing PhantomJS\" && curl -Ls \"https://github.com/dustinblackman/phantomized/releases/download/2.1.1/dockerized-phantomjs.tar.gz\" | tar xz -C /"
+RUN yarn install --frozen-lockfile --mutex file:/tmp/.yarn-mutex
 COPY . .
 RUN npm run postinstall
-RUN if [ -z \"employee\" ]; then exit 1; fi;"
-RUN if [ -z \"production\" ]; then exit 1; fi;"
+RUN if [ -z \"employee\" ]; then exit 1; fi;
+RUN if [ -z \"production\" ]; then exit 1; fi;
 RUN ./tools/build-separated-app.sh 
 RUN yarn install --production --frozen-lockfile --mutex file:/tmp/.yarn-mutex
 #ADD bazel.sh /builder/bazel.sh
