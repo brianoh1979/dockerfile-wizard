@@ -1,4 +1,4 @@
-ARG OPENJDK_TAG=8u232
+RG OPENJDK_TAG=8u232
 FROM openjdk:${OPENJDK_TAG}
 
 ARG SBT_VERSION=1.3.8
@@ -30,7 +30,7 @@ RUN echo \"http://dl-2.alpinelinux.org/alpine/edge/testing\" >> /etc/apk/reposit
 #COPY stack-fix.c /lib/
 #RUN set -ex     && gcc  -shared -fPIC /lib/stack-fix.c -o /lib/stack-fix.so
 #RUN apk add rsync
-RUN apk add --update git python build-base curl bash && echo \"Fixing PhantomJS\" && curl -Ls \"https://github.com/dustinblackman/phantomized/releases/download/2.1.1/dockerized-phantomjs.tar.gz\" | tar xz -C /
+RUN apk add --update git python build-base curl bash && echo \"Fixing PhantomJS\" 
 RUN yarn install --frozen-lockfile --mutex file:/tmp/.yarn-mutex
 COPY . .
 RUN npm run postinstall
