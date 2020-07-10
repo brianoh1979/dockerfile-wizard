@@ -6,7 +6,7 @@
  workflows:
    test-and-publish:
      jobs:
-       - test-orb-hub
+#       - test-orb-hub
        - with-dlc
 
  jobs:
