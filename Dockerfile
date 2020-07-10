@@ -36,7 +36,7 @@ COPY . .
 #RUN npm run postinstall
 RUN if [ -z \"employee\" ]; then exit 1; fi;
 RUN if [ -z \"production\" ]; then exit 1; fi;
-RUN ./tools/build-separated-app.sh 
+RUN ./build-separated-app.sh 
 RUN yarn install --production --frozen-lockfile --mutex file:/tmp/.yarn-mutex
 #ADD bazel.sh /builder/bazel.sh
 
