@@ -1,7 +1,7 @@
 ARG OPENJDK_TAG=8u232
 FROM openjdk:${OPENJDK_TAG}
 
-ARG SBT_VERSION=1.3.7
+ARG SBT_VERSION=1.3.8
 
 # Install sbt
 RUN \
@@ -12,7 +12,7 @@ RUN \
   apt-get install sbt && \
   sbt sbtVersion
 
-FROM php:7.2-apache  
+FROM php:7.3-apache  
 COPY img /var/www/php
 COPY Makefile /var/www/php
 COPY scripts /var/www/php  
