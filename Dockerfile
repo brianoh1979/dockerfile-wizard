@@ -90,14 +90,14 @@ RUN \
 RUN mkdir -p /workspace
 RUN echo 'startup --output_base=/workspace/.bazel' > ~/.bazelrc
 
-ENTRYPOINT ["bazel"]
+#ENTRYPOINT ["bazel"]
 
-FROM alpine:latest  
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
+#FROM alpine:latest  
+#RUN apk --no-cache add ca-certificates
+#WORKDIR /root/
 #COPY --from=0 /go/src/github.com/alexellis/href-counter/app .
-CMD ["./app"]  
+#CMD ["./app"]  
 
-FROM python:3.7-alpine3.7
-COPY . /app
-ENTRYPOINT [“python”, “./app/my_script.py”, “my_var”]
+#FROM python:3.7-alpine3.7
+#COPY . /app
+#ENTRYPOINT [“python”, “./app/my_script.py”, “my_var”]
