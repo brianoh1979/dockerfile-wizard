@@ -24,9 +24,9 @@ RUN apk add --update --no-cache bash build-base curl git python
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --mutex file:/tmp/.yarn-mutex
 RUN npm set progress=false
-RUN echo \"http://dl-2.alpinelinux.org/alpine/edge/main\" > /etc/apk/repositories"
-RUN echo \"http://dl-2.alpinelinux.org/alpine/edge/community\" >> /etc/apk/repositories"
-RUN echo \"http://dl-2.alpinelinux.org/alpine/edge/testing\" >> /etc/apk/repositories"
+RUN echo \"http://dl-2.alpinelinux.org/alpine/edge/main\" > /etc/apk/repositories
+RUN echo \"http://dl-2.alpinelinux.org/alpine/edge/community\" >> /etc/apk/repositories
+RUN echo \"http://dl-2.alpinelinux.org/alpine/edge/testing\" >> /etc/apk/repositories
 #COPY stack-fix.c /lib/
 #RUN set -ex     && gcc  -shared -fPIC /lib/stack-fix.c -o /lib/stack-fix.so
 RUN apk add rsync
