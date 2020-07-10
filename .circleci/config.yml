@@ -32,7 +32,7 @@
               TAG=${cache-orb:${CIRCLE_BRANCH/\//-}}
               echo "$DOCKER_PASSWORD" | docker login --username brianoh1979 --password-stdin
               mkdir -p workspace/images
-              if ! docker image pull hub.docker.com/brianoh1979/bohruby2:$TAG ; then
+              if ! docker image pull brianoh1979/bohruby:$TAG ; then
                 docker build -t front-fast .
                 docker image save front-fast > workspace/images/front-fast.gz
               fi
