@@ -30,13 +30,8 @@
             no_output_timeout: 1h
             command: |
               TAG=${cache-orb:${CIRCLE_BRANCH/\//-}}
-              #docker login ${DOCKER_REGISTRY_HOSTNAME} -u ${DOCKER_REGISTRY_USER} -p ${DOCKER_REGISTRY_PASSWORD}
               echo "$DOCKER_PASSWORD" | docker login --username brianoh1979 --password-stdin
               mkdir -p workspace/images
-#              DOCKER_IMAGE_NAME="front-dist"
-#              if [ "<< parameters.angular_config >>" == "fast" ] ; then
-#                DOCKER_IMAGE_NAME="front-fast"
-#              fi
               if ! docker image pull hub.docker.com/brianoh1979/bohruby:$TAG ; then
                 docker build .
                 docker image save front-fast > workspace/images/front-fast.gz
