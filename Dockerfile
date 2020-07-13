@@ -54,9 +54,9 @@ WORKDIR /data/opt/frontend
 COPY . .
 
 # Fixing patch-package that don't find patch files after yarn install
-RUN npm run postinstall
+#RUN npm run postinstall
 
-CMD npm run serve
+#CMD npm run serve
 
 # Builder
 FROM local as build
