@@ -15,7 +15,7 @@ services:
       - cypress-init-data
 
   backend-service:
-    image: registry.padoa.fr/padoa/back-dist:${CIRCLECI_BACK_BRANCH}
+    image: docker.io/brianoh1979/bohruby:$TAG
     links:
       - "elasticsearch:elasticsearch"
     restart: "no"
@@ -50,7 +50,7 @@ services:
       - cypress-init-data
 
   fake-s3:
-    image: registry.padoa.fr/padoa/fake-s3:latest
+    image: minio/minio
     environment:
       S3_ENDPOINT: "0.0.0.0"
       S3_BUCKET_NAME: filemedia-local

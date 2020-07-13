@@ -24,10 +24,10 @@ RUN echo "http://dl-2.alpinelinux.org/alpine/edge/community" >> /etc/apk/reposit
 RUN echo "http://dl-2.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
 
 # Fixing alpine stack for lib-sass #https://github.com/sass/node-sass/issues/2031
-COPY stack-fix.c /lib/
-RUN set -ex \
-    && gcc  -shared -fPIC /lib/stack-fix.c -o /lib/stack-fix.so
-ENV LD_PRELOAD /lib/stack-fix.so
+#COPY stack-fix.c /lib/
+#RUN set -ex \
+#    && gcc  -shared -fPIC /lib/stack-fix.c -o /lib/stack-fix.so
+#ENV LD_PRELOAD /lib/stack-fix.so
 
 # Build
 FROM base as local
@@ -74,7 +74,7 @@ ARG ANGULAR_CONFIG
 RUN if [ -z "$APP_NAME" ]; then exit 1; fi;
 RUN if [ -z "$ANGULAR_CONFIG" ]; then exit 1; fi;
 
-RUN ./tools/build-separated-app.sh ${APP_NAME} ${ANGULAR_CONFIG}
+RUN ./build-separated-app.sh 
 WORKDIR /data/opt/frontend/dist/${APP_NAME}
 RUN yarn install --production --frozen-lockfile --mutex file:/tmp/.yarn-mutex
 
@@ -193,5 +193,5 @@ RUN node_modules/.bin/cypress install
 RUN echo "Editing Cypress file at /root/.cache/Cypress/*/Cypress/resources/app/packages/server/config/app.yml"
 
 
-COPY tools/sorry_cypress.sh .
+COPY sorry_cypress.sh .
 RUN ./sorry_cypress.sh
