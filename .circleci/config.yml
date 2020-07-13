@@ -35,6 +35,7 @@
               mkdir -p workspace/images
               if ! docker image pull brianoh1979/bohruby:$TAG ; then
                 docker build -t front-fast --build-arg BUILDKIT_INLINE_CACHE=1 .
+                docker build -t front-fast .
                 docker image save front-fast > workspace/images/front-fast.gz
               fi
         - run:
