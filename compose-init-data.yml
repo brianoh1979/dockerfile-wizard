@@ -15,7 +15,7 @@ services:
       - cypress-init-data
 
   backend-service:
-    image: docker.io/brianoh1979/bohruby:$TAG
+    image: docker.io/brianoh1979/bohruby:ruby263
     links:
       - "elasticsearch:elasticsearch"
     restart: "no"

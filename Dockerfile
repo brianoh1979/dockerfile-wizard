@@ -69,10 +69,10 @@ RUN yarn install --production --frozen-lockfile --mutex file:/tmp/.yarn-mutex
 # Build separated app
 FROM local as build-separated-app
 
-ARG APP_NAME
-ARG ANGULAR_CONFIG
-RUN if [ -z "$APP_NAME" ]; then exit 1; fi;
-RUN if [ -z "$ANGULAR_CONFIG" ]; then exit 1; fi;
+#ARG APP_NAME
+#ARG ANGULAR_CONFIG
+#RUN if [ -z "$APP_NAME" ]; then exit 1; fi;
+#RUN if [ -z "$ANGULAR_CONFIG" ]; then exit 1; fi;
 
 RUN ./build-separated-app.sh 
 WORKDIR /data/opt/frontend/dist/${APP_NAME}
