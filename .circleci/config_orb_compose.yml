@@ -1,0 +1,30 @@
+ version: 2.1
+ orbs:
+   docker-cache: cci-x/docker-registry-image-cache@0.2.11
+
+
+ jobs:
+   build:
+     machine:
+      image: 'ubuntu-1604:201903-01'
+
+     steps:
+       - checkout
+       - run:
+           name: docker login
+           command: |
+             echo "$DOCKER_PASSWORD" | \
+               docker login --username "$DOCKER_USERNAME" --password-stdin https://index.docker.io/v1
+       - docker-cache/with-save-restore-images:
+           repository: docker.io/brianoh1979
+           images: '$IMAGE_NAME:$IMAGE_TAG'
+           steps:
+             - docker-cache/build:
+                 command: 'docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .'
+   #              command: 'docker-compose -f compose-init-data.yml build'
+       - run: docker image ls -a
+       - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+       - run: docker push $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG && sleep 10
+       - store_artifacts:
+           path: Dockerfile
+
