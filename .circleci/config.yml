@@ -5,6 +5,7 @@
 
  jobs:
    build:
+     parallelism: 25
      machine:
       image: 'ubuntu-1604:201903-01'
 
