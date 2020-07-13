@@ -4,7 +4,7 @@ services:
     build:
       context: .
       cache_from:
-        - docker.io/brianoh1979
+        - docker.io/brianoh1979:bohruby
     ports:
       - "5000:5000"
   redis:
