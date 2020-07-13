@@ -20,8 +20,8 @@
            images: '$IMAGE_NAME:$IMAGE_TAG'
            steps:
              - docker-cache/build:
-   #              command: 'docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .'
-                 command: 'docker-compose -f docker-compose.multi.yml build'
+                 command: 'docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .'
+   #              command: 'docker-compose -f compose-init-data.yml build'
        - run: docker image ls -a
        - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
        - run: docker push $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG && sleep 10

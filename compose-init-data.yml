@@ -1,0 +1,91 @@
+version: '3.1'
+
+services:
+
+  db-service:
+    image: postgres:11-alpine
+    restart: "no"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: pg_pass
+      POSTGRES_DB: wellinjob
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - cypress-init-data
+
+  backend-service:
+    image: registry.padoa.fr/padoa/back-dist:${CIRCLECI_BACK_BRANCH}
+    links:
+      - "elasticsearch:elasticsearch"
+    restart: "no"
+    command:
+      - bash
+      - -c
+      - |
+        LOG_LEVEL=warn npm run init-data-ssti-v2
+    volumes:
+      - ./dump_filemedia:/filemedia
+    environment:
+      PG_USER: 'postgres'
+      PG_HOST: 'db-service'
+      PG_PORT: 5432
+      PG_DATABASE: "wellinjob"
+      NODE_ENV: web_e2e
+      FILE_MEDIA_DIR: "/filemedia"
+      DEBUG: api,errors,test
+      S3_ENDPOINT: 'http://10.230.38.3:4567'
+      # Elastic Env
+      ELASTIC_SEARCH_ARCHIVE_INDEX_NAME: archive
+      ELASTIC_SEARCH_DEDUP_INDEX_NAME: dedup-pair
+      ELASTIC_SEARCH_EMPLOYEE_INDEX_NAME: employees
+      ELASTIC_SEARCH_REMINDER_INDEX_NAME: reminders
+      ELASTIC_SEARCH_FIRM_INDEX_NAME: firm
+      ELASTIC_SEARCH_URL: "http://elasticsearch:9200"
+    depends_on:
+      - db-service
+      - fake-s3
+      - elasticsearch
+    networks:
+      - cypress-init-data
+
+  fake-s3:
+    image: registry.padoa.fr/padoa/fake-s3:latest
+    environment:
+      S3_ENDPOINT: "0.0.0.0"
+      S3_BUCKET_NAME: filemedia-local
+    ports:
+      - "4567:4567"
+    volumes:
+      - ./file_media_S3:/src/file_media_S3
+    networks:
+      cypress-init-data:
+        ipv4_address: 10.230.38.3
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.0
+    ports:
+      - "127.0.0.1:9200:9200"
+      - "127.0.0.1:9300:9300"
+    environment:
+      discovery.type: "single-node"
+      ES_JAVA_OPTS: "-Xms128m -Xmx128m"
+      network.bind_host: "0.0.0.0"
+      network.publish_host: "0.0.0.0"
+      bootstrap.memory_lock: "true"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      cypress-init-data:
+        ipv4_address: 10.230.38.4
+
+volumes:
+  esdata:
+  pgdata:
+
+networks:
+  cypress-init-data:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.230.38.0/24
