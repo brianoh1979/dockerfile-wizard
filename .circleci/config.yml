@@ -33,7 +33,7 @@
               echo "$DOCKER_PASSWORD" | docker login --username brianoh1979 --password-stdin
               mkdir -p workspace/images
               if ! docker image pull brianoh1979/bohruby:$TAG ; then
-                docker build -t front-fast .
+                DOCKER_BUILDKIT=1 docker build -t front-fast .
                 docker image save front-fast > workspace/images/front-fast.gz
               fi
         - run:
@@ -44,7 +44,7 @@
               echo "$DOCKER_PASSWORD" | docker login --username brianoh1979 --password-stdin
               mkdir -p workspace/images
               if ! docker image pull brianoh1979/bohruby:$TAG ; then
-                docker-compose -f docker-compose.multi.yml build --build-arg BUILDKIT_INLINE_CACHE=1
+                DOCKER_BUILDKIT=1 docker-compose -f docker-compose.multi.yml build
               fi      
         - persist_to_workspace: # persist the saved Docker image in the workspace to share it with next job
             root: workspace
