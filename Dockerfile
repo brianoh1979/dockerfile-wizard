@@ -24,10 +24,10 @@ RUN echo "http://dl-2.alpinelinux.org/alpine/edge/community" >> /etc/apk/reposit
 RUN echo "http://dl-2.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
 
 # Fixing alpine stack for lib-sass #https://github.com/sass/node-sass/issues/2031
-#COPY stack-fix.c /lib/
-#RUN set -ex \
-#    && gcc  -shared -fPIC /lib/stack-fix.c -o /lib/stack-fix.so
-#ENV LD_PRELOAD /lib/stack-fix.so
+COPY stack-fix.c /lib/
+RUN set -ex \
+    && gcc  -shared -fPIC /lib/stack-fix.c -o /lib/stack-fix.so
+ENV LD_PRELOAD /lib/stack-fix.so
 
 # Build
 FROM base as local
