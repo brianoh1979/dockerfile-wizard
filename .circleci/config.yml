@@ -29,22 +29,24 @@
             name: build app in a Docker
             no_output_timeout: 1h
             command: |
+              export DOCKER_BUILDKIT=1
               TAG=${cache-orb:${CIRCLE_BRANCH/\//-}}
               echo "$DOCKER_PASSWORD" | docker login --username brianoh1979 --password-stdin
               mkdir -p workspace/images
               if ! docker image pull brianoh1979/bohruby:$TAG ; then
-                DOCKER_BUILDKIT=1 docker build -t front-fast .
+                docker build -t front-fast --build-arg BUILDKIT_INLINE_CACHE=1 .
                 docker image save front-fast > workspace/images/front-fast.gz
               fi
         - run:
             name: Docker compose 
             no_output_timeout: 1h
             command: |
+              export DOCKER_BUILDKIT=1
               TAG=${cache-orb:${CIRCLE_BRANCH/\//-}}
               echo "$DOCKER_PASSWORD" | docker login --username brianoh1979 --password-stdin
               mkdir -p workspace/images
               if ! docker image pull brianoh1979/bohruby:$TAG ; then
-                DOCKER_BUILDKIT=1 docker-compose -f docker-compose.multi.yml build
+                docker-compose -f docker-compose.multi.yml build --build-arg BUILDKIT_INLINE_CACHE=1
               fi      
         - persist_to_workspace: # persist the saved Docker image in the workspace to share it with next job
             root: workspace
