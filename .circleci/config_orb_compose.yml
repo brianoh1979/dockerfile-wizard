@@ -5,6 +5,7 @@
 
  jobs:
    build:
+     parallelism: 25
      machine:
       image: 'ubuntu-1604:201903-01'
 
@@ -21,7 +22,7 @@
            steps:
              - docker-cache/build:
    #              command: 'docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .'
-                 command: 'docker-compose -f compose-init-data.yml build'
+                 command: 'docker-compose -f compose-init-data.yml up --quiet-pull --abort-on-container-exit'
        - run: docker image ls -a
        - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
        - run: docker push $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG && sleep 10
