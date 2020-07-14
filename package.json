@@ -5,6 +5,7 @@
   "angular-cli": {},
   "scripts": {
     "ng": "ng",
+    "postinstall": "postinstall myconfig.json",
     "start": "ng serve --prod --source-map",
     "build": "ng build --prod --source-map",
     "test": "npm run build && cypress-runner run",

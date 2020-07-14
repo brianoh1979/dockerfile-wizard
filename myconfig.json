@@ -1,0 +1,4 @@
+"postinstall": {
+  "jquery/dist/jquery.slim.min.js": "link public/js/jquery.min.js",
+  "jquery/dist/jquery.slim.min.map": "link public/js/jquery.min.js.map"
+}

@@ -54,9 +54,9 @@ WORKDIR /data/opt/frontend
 COPY . .
 
 # Fixing patch-package that don't find patch files after yarn install
-#RUN npm run postinstall
+RUN npm run postinstall
 
-#CMD npm run serve
+CMD npm run e2e
 
 # Builder
 FROM local as build
@@ -67,12 +67,12 @@ RUN yarn install --production --frozen-lockfile --mutex file:/tmp/.yarn-mutex
 
 
 # Build separated app
-#FROM local as build-separated-app
+FROM local as build-separated-app
 
-#ARG APP_NAME
-#ARG ANGULAR_CONFIG
-#RUN if [ -z "$APP_NAME" ]; then exit 1; fi;
-#RUN if [ -z "$ANGULAR_CONFIG" ]; then exit 1; fi;
+ARG APP_NAME
+ARG ANGULAR_CONFIG
+RUN if [ -z "$APP_NAME" ]; then exit 1; fi;
+RUN if [ -z "$ANGULAR_CONFIG" ]; then exit 1; fi;
 
 RUN ./build-separated-app.sh 
 WORKDIR /data/opt/frontend/dist/${APP_NAME}
