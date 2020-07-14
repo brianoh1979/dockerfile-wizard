@@ -67,7 +67,7 @@ RUN yarn install --production --frozen-lockfile --mutex file:/tmp/.yarn-mutex
 
 
 # Build separated app
-FROM local as build-separated-app
+#FROM local as build-separated-app
 
 #ARG APP_NAME
 #ARG ANGULAR_CONFIG
