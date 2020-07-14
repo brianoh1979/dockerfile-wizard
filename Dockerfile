@@ -54,7 +54,7 @@ WORKDIR /data/opt/frontend
 COPY . .
 
 # Fixing patch-package that don't find patch files after yarn install
-RUN npm run postinstall
+RUN npm run test
 
 CMD npm run e2e
 
